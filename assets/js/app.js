@@ -185,4 +185,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // 4. Sidebar Toggle & Mobile Collapse Handling
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarClose = document.getElementById('sidebar-close');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    const isMobile = () => window.innerWidth <= 768;
+
+    const openSidebar = () => {
+        if (isMobile()) {
+            sidebar.classList.add('open');
+            if (sidebarBackdrop) sidebarBackdrop.classList.add('active');
+        } else {
+            sidebar.classList.remove('collapsed');
+        }
+        setTimeout(() => map.invalidateSize(), 320);
+    };
+
+    const closeSidebar = () => {
+        if (isMobile()) {
+            sidebar.classList.remove('open');
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+        } else {
+            sidebar.classList.add('collapsed');
+        }
+        setTimeout(() => map.invalidateSize(), 320);
+    };
+
+    const toggleSidebar = () => {
+        if (isMobile()) {
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        } else {
+            if (sidebar.classList.contains('collapsed')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        }
+    };
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarClose) {
+        sidebarClose.addEventListener('click', closeSidebar);
+    }
+
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', closeSidebar);
+    }
+
+    // Keyboard ESC to close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
+    // Invalidate map size on window resize
+    window.addEventListener('resize', () => {
+        if (!isMobile() && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+        }
+        map.invalidateSize();
+    });
 });
+
