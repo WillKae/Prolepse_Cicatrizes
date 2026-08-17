@@ -22,27 +22,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set default basemap
     basemaps.satellite.addTo(map);
 
-    // Render Basemap Selector UI
+    // Render Basemap Selector UI - Google Maps Style
     const basemapSelector = document.getElementById('basemap-selector');
     const basemapConfig = [
-        { id: 'osm', name: 'OpenStreetMap', icon: '<i class="fa-solid fa-map" style="font-size: 20px; color: var(--primary-color); margin-right: 12px; width: 24px; text-align: center;"></i>' },
-        { id: 'satellite', name: 'Esri Satellite', icon: '<i class="fa-solid fa-satellite" style="font-size: 20px; color: var(--primary-color); margin-right: 12px; width: 24px; text-align: center;"></i>' },
-        { id: 'carto', name: 'Carto Light', icon: '<i class="fa-solid fa-map-location-dot" style="font-size: 20px; color: var(--primary-color); margin-right: 12px; width: 24px; text-align: center;"></i>' }
+        { id: 'satellite', name: 'Satélite', thumb: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/7/47/63' },
+        { id: 'osm', name: 'Mapa', thumb: 'https://tile.openstreetmap.org/7/63/47.png' },
+        { id: 'carto', name: 'Claro', thumb: 'https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/7/63/47.png' }
     ];
 
     basemapConfig.forEach((bm, index) => {
         const div = document.createElement('div');
-        div.className = `basemap-option ${index === 1 ? 'active' : ''}`;
+        div.className = `basemap-option ${index === 0 ? 'active' : ''}`;
         div.innerHTML = `
-            ${bm.icon}
-            <span>${bm.name}</span>
+            <img class="bm-thumb" src="${bm.thumb}" alt="${bm.name}">
+            <div class="bm-label">${bm.name}</div>
         `;
         div.addEventListener('click', () => {
-            // Remove all basemaps
             Object.values(basemaps).forEach(layer => map.removeLayer(layer));
-            // Add selected
             basemaps[bm.id].addTo(map);
-            // Update UI
             document.querySelectorAll('.basemap-option').forEach(el => el.classList.remove('active'));
             div.classList.add('active');
         });
@@ -52,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Define GeoJSON Layers
     const layersConfig = [
         { id: 'ms', name: 'Limite MS', file: 'MS.geojson', fillColor: '#ffff00', strokeColor: '#ffff00', weight: 2, fillOpacity: 0, type: 'polygon' },
-        { id: 'municipios', name: 'Municípios', file: 'Municipios.geojson', fillColor: '#bdc3c7', strokeColor: 'white', weight: 0.5, fillOpacity: 0, type: 'polygon' },
+        { id: 'municipios', name: 'Municípios', file: 'Municipios.geojson', fillColor: '#bdc3c7', strokeColor: 'white', weight: 0.5, fillOpacity: 0, type: 'polygon', popupFields: ['NM_MUN', 'AREA_KM2'] },
         { id: 'visitas', name: 'Visitas Prolepse', file: 'Visitas_Prolepse.geojson', fillColor: '#ffff00', strokeColor: '#ffff00', fillOpacity: 0.20, type: 'polygon' },
         { id: 'prolepse_1bpma', name: 'Prolepse 1º BPMA', file: 'Prolepse_1_BPMA.geojson', fillColor: '#ffff00', strokeColor: '#ffff00', fillOpacity: 0.20, type: 'polygon' },
         { id: 'prolepse_2bpma', name: 'Prolepse 2º BPMA', file: 'Prolepse_2_BPMA.geojson', fillColor: '#ffff00', strokeColor: '#ffff00', fillOpacity: 0.20, type: 'polygon' },
@@ -146,11 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                     });
                                 },
                                 onEachFeature: (feature, layerObj) => {
-                                    // Bind a simple popup with properties
                                     if (feature.properties) {
-                                        let popupContent = '<div style="max-height: 200px; overflow-y: auto;"><b>Atributos:</b><br>';
-                                        for (const key in feature.properties) {
-                                            popupContent += `<b>${key}:</b> ${feature.properties[key]}<br>`;
+                                        const fields = layer.popupFields;
+                                        const props = fields
+                                            ? Object.fromEntries(fields.filter(k => k in feature.properties).map(k => [k, feature.properties[k]]))
+                                            : feature.properties;
+                                        let popupContent = '<div style="max-height: 200px; overflow-y: auto;">';
+                                        for (const key in props) {
+                                            popupContent += `<b>${key}:</b> ${props[key]}<br>`;
                                         }
                                         popupContent += '</div>';
                                         layerObj.bindPopup(popupContent);

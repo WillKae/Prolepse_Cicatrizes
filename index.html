@@ -38,16 +38,21 @@
             
             <div class="sidebar-content">
                 <div class="panel-section">
-                    <h3>Mapas de Fundo</h3>
-                    <div class="basemap-selector" id="basemap-selector">
-                        <!-- Basemaps will be injected here via JS -->
-                    </div>
-                </div>
-
-                <div class="panel-section">
                     <h3>Camadas (Layers)</h3>
                     <div class="layer-list" id="layer-list">
                         <!-- Layers will be injected here via JS -->
+                    </div>
+                </div>
+
+                <div class="panel-section sources-section">
+                    <h3>Fontes dos Dados</h3>
+                    <div class="source-item">
+                        <div class="color-box" style="background-color: #B2DF8A; border-color: #B2DF8A;"></div>
+                        <span>Polígono do Imóvel - SICAR</span>
+                    </div>
+                    <div class="source-item">
+                        <div class="color-box" style="background-color: #d35400; border-color: #d35400;"></div>
+                        <span>Cicatrizes de Queimadas - IMASUL</span>
                     </div>
                 </div>
             </div>
@@ -63,6 +68,11 @@
             <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Alternar Menu" aria-label="Alternar Menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
+
+            <!-- Basemap Selector - Google Maps Style -->
+            <div class="basemap-picker" id="basemap-selector">
+                <!-- Basemaps will be injected here via JS -->
+            </div>
 
             <div id="map"></div>
             
